@@ -13,7 +13,6 @@ public static class ListofRuleResultTreeExtension
 
     public delegate void OnSuccessFunc(string eventName);
 
-
     /// <summary>
     ///     Calls the Success Func for the first rule which succeeded among the ruleResults
     /// </summary>
@@ -35,7 +34,7 @@ public static class ListofRuleResultTreeExtension
     }
 
     /// <summary>
-    ///     Calls the Failure Func if all rules failed in the ruleReults
+    ///     Calls the Failure Func if all rules failed in the rule results
     /// </summary>
     /// <param name="ruleResultTrees"></param>
     /// <param name="onFailureFunc"></param>
