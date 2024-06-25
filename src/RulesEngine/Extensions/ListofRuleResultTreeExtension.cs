@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System.Collections.Generic;
 
@@ -12,10 +13,11 @@ public static class ListofRuleResultTreeExtension
 
     public delegate void OnSuccessFunc(string eventName);
 
+
     /// <summary>
     ///     Calls the Success Func for the first rule which succeeded among the ruleResults
     /// </summary>
-    /// <param name="ruleResultTrees">The <see cref="RuleResultTree" /> of the <see cref="Rule" /> which was running</param>
+    /// <param name="ruleResultTrees">The <see cref="RuleResultTree" /> of the <see cref="IRule" /> which was running</param>
     /// <param name="onSuccessFunc">The function to be called on success</param>
     /// <returns></returns>
     public static List<RuleResultTree> OnSuccess(this List<RuleResultTree> ruleResultTrees, OnSuccessFunc onSuccessFunc)
@@ -26,7 +28,7 @@ public static class ListofRuleResultTreeExtension
             return ruleResultTrees;
         }
 
-        var eventName = successfulRuleResult.Rule.SuccessEvent ?? successfulRuleResult.Rule.RuleName;
+        var eventName = successfulRuleResult.ResultRule.SuccessEvent ?? successfulRuleResult.ResultRule.RuleName;
         onSuccessFunc(eventName);
 
         return ruleResultTrees;

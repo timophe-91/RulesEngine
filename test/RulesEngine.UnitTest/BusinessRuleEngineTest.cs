@@ -705,9 +705,6 @@ public class RulesEngineTest
         var re = new RulesEngine([workflow]);
         var input = new RuleTestClass { Country = null };
 
-        dynamic input1 = new ExpandoObject();
-
-
         var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
 
         Assert.NotNull(result);
@@ -886,6 +883,7 @@ public class RulesEngineTest
     {
         var classType = typeof(RulesEngine);
         var interfaceType = typeof(IRulesEngine);
+        var interfaceExtendedType = typeof(IRulesEngineExtended);
 
         var classMethods = classType.GetMethods(BindingFlags.DeclaredOnly |
                                                 BindingFlags.Public |
@@ -893,7 +891,12 @@ public class RulesEngineTest
 
 
         var interfaceMethods = interfaceType.GetMethods();
-        Assert.Equal(interfaceMethods.Count(), classMethods.Length);
+        var interfaceExtensionMethods = interfaceExtendedType.GetMethods();
+
+        var combinedMethods = interfaceMethods.Concat(interfaceExtensionMethods);
+
+
+        Assert.Equal(combinedMethods.Count(), classMethods.Length);
     }
 
 

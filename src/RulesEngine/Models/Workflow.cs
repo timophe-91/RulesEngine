@@ -1,30 +1,26 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using RulesEngine.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace RulesEngine.Models;
 
-/// <summary>
-///     Outdated class. Use <see cref="Workflow" /> class instead.
-/// </summary>
+/// <inheritdoc />
 [Obsolete("WorkflowRules class is deprecated. Use Workflow class instead.")]
 [ExcludeFromCodeCoverage]
 public class WorkflowRules : Workflow
 {
 }
 
-/// <summary>
-///     The workflow for the rules engine to execute.
-/// </summary>
+/// <inheritdoc />
 [ExcludeFromCodeCoverage]
-public class Workflow
+public class Workflow : IWorkflow
 {
-    /// <summary>
-    ///     Outdated property. Use <see cref="WorkflowsToInject" /> instead.
-    /// </summary>
+    /// <inheritdoc />
     [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
     public IEnumerable<string> WorkflowRulesToInject {
         set => WorkflowsToInject = value;
@@ -35,23 +31,27 @@ public class Workflow
     /// </summary>
     public IEnumerable<Rule> Rules { get; set; }
 
-    /// <summary>
-    ///     The name of the workflow, should be unique within the rules engine.
-    /// </summary>
+    /// <inheritdoc />
     public string WorkflowName { get; set; }
 
-    /// <summary>
-    ///     Gets or sets the workflows to inject when the <see cref="Workflow" /> is executed.
-    /// </summary>
+    /// <inheritdoc />
     public IEnumerable<string> WorkflowsToInject { get; set; }
 
-    /// <summary>
-    ///     The <see cref="RuleExpressionType" />
-    /// </summary>
+    /// <inheritdoc />
     public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
 
-    /// <summary>
-    ///     Gets or Sets the global params which will be applicable to all rules
-    /// </summary>
+    /// <inheritdoc />
     public IEnumerable<ScopedParam> GlobalParams { get; set; }
+
+    /// <inheritdoc />
+    public IEnumerable<IRule> GetRules()
+    {
+        return Rules;
+    }
+
+    /// <inheritdoc />
+    public void SetRules(IEnumerable<IRule> rules)
+    {
+        Rules = rules.OfType<Rule>().ToArray();
+    }
 }
