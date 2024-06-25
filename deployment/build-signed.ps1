@@ -12,4 +12,4 @@ $signKeyFile = Join-Path $directory "signKey.snk";
 $bytes = [Convert]::FromBase64String($signingKey)
 [IO.File]::WriteAllBytes($signKeyFile, $bytes)
 
-dotnet build $csprojFilePath -c Release -p:ContinuousIntegrationBuild=true -p:DelaySign=false -p:AssemblyOriginatorKeyFile=$signKeyFile 
+dotnet pack $csprojFilePath -c Release -p:ContinuousIntegrationBuild=true -p:DelaySign=false -p:AssemblyOriginatorKeyFile=$signKeyFile

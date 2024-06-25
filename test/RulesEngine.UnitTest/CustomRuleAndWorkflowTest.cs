@@ -128,6 +128,8 @@ public class CustomRuleAndWorkflowTest
         public string Expression { get; set; }
         public RuleActions Actions { get; set; }
         public string SuccessEvent { get; set; }
+
+        public string RandomProperty { get; set; }
     }
 
     public class CustomWorkflow : IWorkflow

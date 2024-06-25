@@ -28,7 +28,7 @@ public class RuleExpressionBuilderFactoryTest
     }
 
     [Fact]
-    public void SystemLinqDynamicCore_WithLiterals_ParsingCorretly()
+    public void SystemLinqDynamicCore_WithLiterals_ParsingCorrectly()
     {
         var board = new { NumberOfMembers = default(decimal?) };
 
