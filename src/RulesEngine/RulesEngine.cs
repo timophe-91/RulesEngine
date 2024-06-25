@@ -24,7 +24,7 @@ namespace RulesEngine;
 ///     The Rules Engine itself
 /// </summary>
 /// <seealso cref="IRulesEngine" />
-public class RulesEngine : IRulesEngine
+public class RulesEngine : IRulesEngineExtended
 {
     #region Variables
 
@@ -46,7 +46,28 @@ public class RulesEngine : IRulesEngine
     /// <param name="reSettings"></param>
     public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
     {
-        var workflows = jsonConfig.Select(JsonConvert.DeserializeObject<Workflow>).ToArray();
+        var workflows = jsonConfig.Select(JsonConvert.DeserializeObject<Workflow>).OfType<IWorkflow>().ToArray();
+        AddWorkflow(workflows);
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RulesEngine" /> class.
+    ///     This constructor is used when the rules are in another json format.
+    /// </summary>
+    /// <param name="jsonConfig">The json configuration.</param>
+    /// <param name="type">The type to deserialize the json to, must implement <see cref="IWorkflow" /></param>
+    /// <param name="settings">The <see cref="JsonSerializerSettings" /> to use for deserialization</param>
+    /// <param name="reSettings">The <see cref="ReSettings" /> to use for the rules engine</param>
+    public RulesEngine(string[] jsonConfig, Type type, JsonSerializerSettings settings = null,
+        ReSettings reSettings = null) : this(reSettings)
+    {
+        var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject(item, type, settings))
+            .OfType<IWorkflow>().ToArray();
+        AddWorkflow(workflow);
+    }
+
+    public RulesEngine(IWorkflow[] workflows, ReSettings reSettings = null) : this(reSettings)
+    {
         AddWorkflow(workflows);
     }
 
@@ -112,7 +133,7 @@ public class RulesEngine : IRulesEngine
         params RuleParameter[] ruleParams)
     {
         Array.Sort(ruleParams, (a, b) => string.Compare(a.Name, b.Name));
-        var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams.ToArray());
+        var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
         await ExecuteActionAsync(ruleResultList);
         return ruleResultList;
     }
@@ -144,7 +165,7 @@ public class RulesEngine : IRulesEngine
     private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree,
         bool includeRuleResults = false)
     {
-        var ruleActions = resultTree?.Rule?.Actions;
+        var ruleActions = resultTree?.ResultRule?.Actions;
         var actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
 
         if (actionInfo != null)
@@ -170,7 +191,7 @@ public class RulesEngine : IRulesEngine
     /// </summary>
     /// <param name="workflows">The workflow rules.</param>
     /// <exception cref="RuleValidationException"></exception>
-    public void AddWorkflow(params Workflow[] workflows)
+    public void AddWorkflow(params IWorkflow[] workflows)
     {
         try
         {
@@ -195,13 +216,19 @@ public class RulesEngine : IRulesEngine
         }
     }
 
+    public void AddWorkflow(params Workflow[] workflows)
+    {
+        var iWorkflows = workflows.OfType<IWorkflow>().ToArray();
+        AddWorkflow(iWorkflows);
+    }
+
     /// <summary>
     ///     Adds new workflow rules if not previously added.
     ///     Or updates the rules for an existing workflow.
     /// </summary>
     /// <param name="workflows">The workflow rules.</param>
     /// <exception cref="RuleValidationException"></exception>
-    public void AddOrUpdateWorkflow(params Workflow[] workflows)
+    public void AddOrUpdateWorkflow(params IWorkflow[] workflows)
     {
         try
         {
@@ -216,6 +243,13 @@ public class RulesEngine : IRulesEngine
         {
             throw new RuleValidationException(ex.Message, ex.Errors);
         }
+    }
+
+    /// <inheritdoc />
+    public void AddOrUpdateWorkflow(params Workflow[] workflows)
+    {
+        var iWorkflows = workflows.OfType<IWorkflow>().ToArray();
+        AddOrUpdateWorkflow(iWorkflows);
     }
 
     public List<string> GetAllRegisteredWorkflowNames()
@@ -311,7 +345,7 @@ public class RulesEngine : IRulesEngine
                 ruleParams)
         );
 
-        foreach (var rule in workflow.Rules.Where(c => c.Enabled))
+        foreach (var rule in workflow.GetRules().Where(c => c.Enabled))
         {
             dictFunc.Add(rule.RuleName, CompileRule(rule, workflow.RuleExpressionType, ruleParams, globalParamExp));
         }
@@ -329,7 +363,7 @@ public class RulesEngine : IRulesEngine
             throw new ArgumentException($"Workflow `{workflowName}` is not found");
         }
 
-        var currentRule = workflow.Rules?.SingleOrDefault(c => c.RuleName == ruleName && c.Enabled);
+        var currentRule = workflow.GetRules()?.SingleOrDefault(c => c.RuleName == ruleName && c.Enabled);
         if (currentRule == null)
         {
             throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");
@@ -342,7 +376,7 @@ public class RulesEngine : IRulesEngine
         return CompileRule(currentRule, workflow.RuleExpressionType, ruleParameters, globalParamExp);
     }
 
-    private RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleExpressionType ruleExpressionType,
+    private RuleFunc<RuleResultTree> CompileRule(IRule rule, RuleExpressionType ruleExpressionType,
         RuleParameter[] ruleParams, Lazy<RuleExpressionParameter[]> scopedParams)
     {
         return _ruleCompiler.CompileRule(rule, ruleExpressionType, ruleParams, scopedParams);
@@ -397,7 +431,7 @@ public class RulesEngine : IRulesEngine
         }
 
         var formatErrorMessages = ruleResultList;
-        foreach (var ruleResult in formatErrorMessages)
+        foreach (var ruleResult in formatErrorMessages.Where(r => !r.IsSuccess))
         {
             if (!ruleResult.IsSuccess)
             {
