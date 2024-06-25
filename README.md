@@ -13,6 +13,8 @@ NOTICE: This is a FORK of the RulesEngine project.
 It seems not to be actively maintained anymore.
 The original project can be found [here]( https://github.com/microsoft/RulesEngine)
 
+This fork will develop disconected from the original project.
+
 ## Now with Interface
 
 I just released a [Preview](https://github.com/timophe-91/RulesEngine/releases/tag/v1.1.0-alpha), also on [NuGet](https://www.nuget.org/packages/timophe.RulesEngine/1.1.0-alpha#readme-body-tab).
