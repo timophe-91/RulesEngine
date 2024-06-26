@@ -6,12 +6,11 @@
 
 [download-url]: https://www.nuget.org/packages/timophe.RulesEngine/
 
-# Rules Engine
+# Rules Engine ##
 
-NOTICE: This is a FORK of the RulesEngine project.
+NOTICE: This is a FORK of [microsoft/RulesEngine]( https://github.com/microsoft/RulesEngine)
 
-It seems not to be actively maintained anymore.
-The original project can be found [here]( https://github.com/microsoft/RulesEngine)
+It seems be currently not actively maintained anymore. See [microsoft/RulesEngine/issues/604](https://github.com/microsoft/RulesEngine/issues/604#issuecomment-2184408178)
 
 This fork will develop disconected from the original project.
 
