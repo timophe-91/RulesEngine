@@ -22,7 +22,8 @@ public class Ef
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Running {nameof(Ef)}....");
         Console.ResetColor();
-        const string basicInfo = "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
+        const string basicInfo =
+            "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
         const string orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
         const string telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
 

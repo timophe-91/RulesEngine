@@ -8,10 +8,12 @@
 
 # Rules Engine
 
-NOTICE: This is a FORK of the RulesEngine project.
+NOTICE: This is a FORK of [microsoft/RulesEngine]( https://github.com/microsoft/RulesEngine)
 
-It seems not to be actively maintained anymore.
-The original project can be found [here]( https://github.com/microsoft/RulesEngine)
+It seems to be currently not actively maintained anymore.
+See [microsoft/RulesEngine/issues/604](https://github.com/microsoft/RulesEngine/issues/604#issuecomment-2184408178)
+
+This fork will develop detached from the original project.
 
 ## Now with Interface
 

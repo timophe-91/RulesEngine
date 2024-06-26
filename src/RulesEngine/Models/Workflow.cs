@@ -20,7 +20,9 @@ public class WorkflowRules : Workflow
 [ExcludeFromCodeCoverage]
 public class Workflow : IWorkflow
 {
-    /// <inheritdoc />
+    /// <summary>
+    ///     Outdated property. Use <see cref="WorkflowsToInject" /> instead.
+    /// </summary>
     [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
     public IEnumerable<string> WorkflowRulesToInject {
         set => WorkflowsToInject = value;

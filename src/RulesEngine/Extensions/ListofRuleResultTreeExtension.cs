@@ -13,7 +13,6 @@ public static class ListofRuleResultTreeExtension
 
     public delegate void OnSuccessFunc(string eventName);
 
-
     /// <summary>
     ///     Calls the Success Func for the first rule which succeeded among the ruleResults
     /// </summary>
