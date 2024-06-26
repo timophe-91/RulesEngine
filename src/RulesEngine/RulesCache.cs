@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.HelperFunctions;
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Concurrent;
@@ -17,7 +18,7 @@ internal class RulesCache
     private readonly MemCache _compileRules;
 
     /// <summary>The workflow rules</summary>
-    private readonly ConcurrentDictionary<string, (Workflow, long)> _workflow = new();
+    private readonly ConcurrentDictionary<string, (IWorkflow, long)> _workflow = new();
 
 
     public RulesCache(ReSettings reSettings)
@@ -44,7 +45,7 @@ internal class RulesCache
     /// <summary>Adds the or update workflow rules.</summary>
     /// <param name="workflowName">Name of the workflow.</param>
     /// <param name="rules">The rules.</param>
-    public void AddOrUpdateWorkflows(string workflowName, Workflow rules)
+    public void AddOrUpdateWorkflows(string workflowName, IWorkflow rules)
     {
         var ticks = DateTime.UtcNow.Ticks;
         _workflow.AddOrUpdate(workflowName, (rules, ticks), (_, _) => (rules, ticks));
@@ -70,7 +71,7 @@ internal class RulesCache
     {
         if (_compileRules.TryGetValue(compiledRuleKey,
                 out (IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick) compiledRulesObj) &&
-            _workflow.TryGetValue(workflowName, out (Workflow rules, long tick) workflowsObj))
+            _workflow.TryGetValue(workflowName, out (IWorkflow rules, long tick) workflowsObj))
         {
             return compiledRulesObj.tick >= workflowsObj.tick;
         }
@@ -89,9 +90,9 @@ internal class RulesCache
     /// <param name="workflowName">Name of the workflow.</param>
     /// <returns>Workflows.</returns>
     /// <exception cref="Exception">Could not find injected Workflow: {wfname}</exception>
-    public Workflow GetWorkflow(string workflowName)
+    public IWorkflow GetWorkflow(string workflowName)
     {
-        if (!_workflow.TryGetValue(workflowName, out (Workflow rules, long tick) workflowsObj))
+        if (!_workflow.TryGetValue(workflowName, out (IWorkflow rules, long tick) workflowsObj))
         {
             return null;
         }
@@ -102,9 +103,9 @@ internal class RulesCache
             return workflow;
         }
 
-        if (workflow.Rules == null)
+        if (workflow.GetRules() == null)
         {
-            workflow.Rules = new List<Rule>();
+            workflow.SetRules(new List<IRule>());
         }
 
         foreach (var wfname in workflow.WorkflowsToInject)
@@ -115,7 +116,7 @@ internal class RulesCache
                 throw new Exception($"Could not find injected Workflow: {wfname}");
             }
 
-            workflow.Rules = workflow.Rules.Concat(injectedWorkflow.Rules.ToList());
+            workflow.SetRules(workflow.GetRules().Concat(injectedWorkflow.GetRules()).ToList());
         }
 
         return workflow;
