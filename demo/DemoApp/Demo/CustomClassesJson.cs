@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using RulesEngine.Extensions;
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
@@ -10,39 +11,52 @@ using System.Threading.Tasks;
 
 namespace DemoApp.Demo;
 
-public class CustomClasses
+public class CustomClassesJson
 {
+    /// <summary>
+    ///     When using custom classes, you can still serialize the workflows directly in the JSON format as before.
+    /// </summary>
     public async Task Run()
     {
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Running {nameof(Basic)}....");
+        Console.WriteLine($"Running {nameof(CustomClassesJson)}....");
         Console.ResetColor();
-        var workflows = new List<IWorkflow>();
-        var workflow = new CustomWorkflow { WorkflowName = "Test Workflow Rule 1" };
+        var workflowJson = """
+                           {
+                               "WorkflowRulesToInject": null,
+                               "Rules": [
+                                   {
+                                       "ThisIsAmazingRule": [
+                                           {
+                                               "Id": "CustomRule1",
+                                               "RuleExpressionType": 0,
+                                               "Expression": "input1.x > 10",
+                                           },
+                                           {
+                                               "Id": "CustomRule2",
+                                               "RuleExpressionType": 0,
+                                               "Expression": "input1.x > 10",
+                                           }
+                                       ],
+                                       "Id": "CustomRule",
+                                       "Operator": "And",
+                                       "RuleExpressionType": 0,
+                                       "RandomProperty": "Whatever"
+                                   }
+                               ],
+                               "WorkflowName": "CustomWorkflow",
+                               "RuleExpressionType": 0,
+                               "GlobalParams": null
+                           }
+                           """;
 
-        var rules = new List<CustomRule>();
+        var bre = new RulesEngine.RulesEngine([workflowJson], typeof(CustomWorkflow));
 
-        var rule = new CustomRule {
-            RuleName = "Test Rule",
-            SuccessEvent = "Count is within tolerance.",
-            ErrorMessage = "Over expected.",
-            Expression = "count < 3",
-            RuleExpressionType = RuleExpressionType.LambdaExpression
-        };
+        var converter = new ExpandoObjectConverter();
+        const string basicInfo = "{\"x\": 50}";
+        var inputs = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
 
-        rules.Add(rule);
-
-        workflow.Rules = rules;
-
-        workflows.Add(workflow);
-
-        var bre = new RulesEngine.RulesEngine(workflows.ToArray());
-
-        dynamic datas = new ExpandoObject();
-        datas.count = 1;
-        var inputs = new[] { datas };
-
-        var resultList = await bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs);
+        var resultList = await bre.ExecuteAllRulesAsync("CustomWorkflow", inputs);
 
         bool outcome;
 
@@ -59,6 +73,9 @@ public class CustomClasses
         });
 
         Console.WriteLine($"Test outcome: {outcome}.");
+
+        var reTypedRule = resultList[0].ResultRule as CustomRule;
+        Console.WriteLine($"Added Property from ResultTree still exists: {reTypedRule?.RandomProperty}");
     }
 
     /// <summary>

@@ -79,7 +79,7 @@ public class Rule : IRule
     /// <inheritdoc />
     public void SetRules(IEnumerable<IRule> rules)
     {
-        Rules = rules.OfType<Rule>().ToArray();
+        Rules = rules.OfType<Rule>();
     }
 
     /// <inheritdoc />

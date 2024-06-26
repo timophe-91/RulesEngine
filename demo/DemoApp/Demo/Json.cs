@@ -17,11 +17,13 @@ public class Json
 {
     public async Task Run()
     {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Running {nameof(Json)}....");
-        var basicInfo =
+        Console.ResetColor();
+        const string basicInfo =
             "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
-        var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
-        var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
+        const string orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
+        const string telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
 
         var converter = new ExpandoObjectConverter();
 
@@ -34,10 +36,10 @@ public class Json
         var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
         if (files == null || files.Length == 0)
         {
-            throw new Exception("Rules not found.");
+            throw new FileNotFoundException("Rules not found.");
         }
 
-        var fileData = File.ReadAllText(files[0]);
+        var fileData = await File.ReadAllTextAsync(files[0]);
         var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
         var bre = new RulesEngine.RulesEngine(workflow.ToArray());

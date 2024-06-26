@@ -431,7 +431,7 @@ public class RulesEngine : IRulesEngineExtended
         }
 
         var formatErrorMessages = ruleResultList;
-        foreach (var ruleResult in formatErrorMessages.Where(r => !r.IsSuccess))
+        foreach (var ruleResult in formatErrorMessages)
         {
             if (!ruleResult.IsSuccess)
             {

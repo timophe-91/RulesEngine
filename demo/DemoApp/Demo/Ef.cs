@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
@@ -20,11 +19,13 @@ public class Ef
 {
     public async Task Run()
     {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Running {nameof(Ef)}....");
-        var basicInfo =
+        Console.ResetColor();
+        const string basicInfo =
             "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
-        var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
-        var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
+        const string orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
+        const string telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
 
         var converter = new ExpandoObjectConverter();
 
@@ -37,20 +38,20 @@ public class Ef
         var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
         if (files == null || files.Length == 0)
         {
-            throw new Exception("Rules not found.");
+            throw new FileNotFoundException("Rules not found.");
         }
 
-        var fileData = File.ReadAllText(files[0]);
+        var fileData = await File.ReadAllTextAsync(files[0]);
         var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
         var db = new RulesEngineDemoContext();
-        if (db.Database.EnsureCreated())
+        if (await db.Database.EnsureCreatedAsync())
         {
-            db.Workflows.AddRange(workflow);
-            db.SaveChanges();
+            await db.Workflows.AddRangeAsync(workflow);
+            await db.SaveChangesAsync();
         }
 
-        var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
+        var wfr = await db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArrayAsync();
 
         var bre = new RulesEngine.RulesEngine(wfr);
 

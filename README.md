@@ -8,14 +8,17 @@
 
 # Rules Engine
 
-NOTICE: This is a FORK of the RulesEngine project.
+NOTICE: This is a FORK of [microsoft/RulesEngine]( https://github.com/microsoft/RulesEngine)
 
-It seems not to be actively maintained anymore.
-The original project can be found [here]( https://github.com/microsoft/RulesEngine)
+It seems to be currently not actively maintained anymore.
+See [microsoft/RulesEngine/issues/604](https://github.com/microsoft/RulesEngine/issues/604#issuecomment-2184408178)
+
+This fork will develop detached from the original project.
 
 ## Now with Interface
 
-I just released a [Preview](https://github.com/timophe-91/RulesEngine/releases/tag/v1.1.0-alpha), also on [NuGet](https://www.nuget.org/packages/timophe.RulesEngine/1.1.0-alpha#readme-body-tab).
+I just released a [Preview](https://github.com/timophe-91/RulesEngine/releases/tag/v1.1.0-alpha), also
+on [NuGet](https://www.nuget.org/packages/timophe.RulesEngine/1.1.0-alpha#readme-body-tab).
 There i tried to add Interfaces for Rule and Workflow, to easier customize the behaviour of the rule to personal needs.
 
 I will still fix bugs in 1.0.X and 1.1.X and add in both features until im sure its not breaking anything.

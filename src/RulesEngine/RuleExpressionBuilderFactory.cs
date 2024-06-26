@@ -20,12 +20,9 @@ internal class RuleExpressionBuilderFactory
 
     public RuleExpressionBuilderBase RuleGetExpressionBuilder(RuleExpressionType ruleExpressionType)
     {
-        switch (ruleExpressionType)
-        {
-            case RuleExpressionType.LambdaExpression:
-                return _lambdaExpressionBuilder;
-            default:
-                throw new InvalidOperationException($"{nameof(ruleExpressionType)} has not been supported yet.");
-        }
+        return ruleExpressionType switch {
+            RuleExpressionType.LambdaExpression => _lambdaExpressionBuilder,
+            _ => throw new InvalidOperationException($"{nameof(ruleExpressionType)} has not been supported yet.")
+        };
     }
 }

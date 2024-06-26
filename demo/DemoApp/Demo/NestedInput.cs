@@ -7,6 +7,7 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DemoApp.Demo;
@@ -21,7 +22,9 @@ public class NestedInput
 {
     public async Task Run()
     {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"Running {nameof(NestedInput)}....");
+        Console.ResetColor();
         var nestedInput = new {
             SimpleProp = "simpleProp",
             NestedProp = new {
@@ -34,21 +37,21 @@ public class NestedInput
             SearchOption.AllDirectories);
         if (files == null || files.Length == 0)
         {
-            throw new Exception("Rules not found.");
+            throw new FileNotFoundException("Rules not found.");
         }
 
-        var fileData = File.ReadAllText(files[0]);
-        var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
+        var fileData = await File.ReadAllTextAsync(files[0]);
+        var workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-        var bre = new RulesEngine.RulesEngine(Workflows.ToArray());
-        foreach (var workflow in Workflows)
+        var bre = new RulesEngine.RulesEngine(workflows.ToArray());
+        foreach (var workflowName in workflows.Select(w => w.WorkflowName))
         {
-            var resultList = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput);
+            var resultList = await bre.ExecuteAllRulesAsync(workflowName, nestedInput);
 
             resultList.OnSuccess(eventName => {
-                Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");
+                Console.WriteLine($"{workflowName} evaluation resulted in success - {eventName}");
             }).OnFail(() => {
-                Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
+                Console.WriteLine($"{workflowName} evaluation resulted in failure");
             });
         }
     }
