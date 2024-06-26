@@ -6,7 +6,6 @@ using RulesEngine.Models;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
-using FluentValidation;
 
 namespace RulesEngine.UnitTest;
 
@@ -28,7 +27,7 @@ public class RuleExpressionBuilderFactoryTest
     }
 
     [Fact]
-    public void SystemLinqDynamicCore_WithLiterals_ParsingCorretly()
+    public void SystemLinqDynamicCore_WithLiterals_ParsingCorrectly()
     {
         var board = new { NumberOfMembers = default(decimal?) };
 

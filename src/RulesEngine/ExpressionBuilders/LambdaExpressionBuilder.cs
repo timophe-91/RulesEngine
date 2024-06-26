@@ -3,6 +3,7 @@
 
 using RulesEngine.Exceptions;
 using RulesEngine.HelperFunctions;
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
         _ruleExpressionParser = ruleExpressionParser;
     }
 
-    internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
+    internal override RuleFunc<RuleResultTree> BuildDelegateForRule(IRule rule, RuleParameter[] ruleParams)
     {
         try
         {
