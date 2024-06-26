@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace RulesEngine.UnitTest;
+namespace RulesEngine.UnitTest.CustomClasses;
 
 /// <summary>
 ///     Test with custom rules and workflows classes
@@ -63,19 +63,20 @@ public class CustomRuleAndWorkflowTest
                                    {
                                        "ThisIsAmazingRule": [
                                            {
-                                               "RuleName": "CustomRule1",
+                                               "Id": "CustomRule1",
                                                "RuleExpressionType": 0,
                                                "Expression": "input1.x > 10",
                                            },
                                            {
-                                               "RuleName": "CustomRule2",
+                                               "Id": "CustomRule2",
                                                "RuleExpressionType": 0,
                                                "Expression": "input1.x > 10",
                                            }
                                        ],
-                                       "RuleName": "CustomRule",
+                                       "Id": "CustomRule",
                                        "Operator": "And",
                                        "RuleExpressionType": 0,
+                                       "RandomProperty": "Whatever"
                            
                                    }
                                ],
@@ -91,6 +92,15 @@ public class CustomRuleAndWorkflowTest
         Assert.NotNull(result);
         Assert.IsType<List<RuleResultTree>>(result);
         Assert.Contains(result, c => c.IsSuccess);
+
+        var firstResult = (CustomRule)result[0].ResultRule;
+        Assert.NotNull(firstResult);
+        Assert.IsType<CustomRule>(firstResult);
+        Assert.Equal("CustomRule", firstResult.RuleName);
+        Assert.Equal("And", firstResult.Operator);
+        Assert.Equal(2, firstResult.ThisIsAmazingRule.Count());
+        Assert.Contains(firstResult.ThisIsAmazingRule, c => c.RuleName == "CustomRule1");
+        Assert.Equal("Whatever", firstResult.RandomProperty);
     }
 
 
@@ -102,23 +112,51 @@ public class CustomRuleAndWorkflowTest
         return JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
     }
 
+    /// <summary>
+    ///     Class to implement a custom rule version
+    /// </summary>
     public class CustomRule : IRule
     {
+        /// <summary>
+        ///     This is how the nested rules could be defined.
+        /// </summary>
         public IEnumerable<CustomRule> ThisIsAmazingRule { get; set; }
+
+        public string RandomProperty { get; set; } = "RandomProperty";
+
+        /// <summary>
+        ///     Rule name for the Rule, should be unique within the workflow.
+        ///     With tag to save it as ID.
+        /// </summary>
+        [JsonProperty("Id")]
         public string RuleName { get; set; }
 
         public Dictionary<string, object> Properties { get; set; }
+
+        /// <summary>
+        ///     The Operator to be used to combine the <see cref="ThisIsAmazingRule" /> or nested rules.
+        /// </summary>
         public string Operator { get; set; }
+
         public string ErrorMessage { get; set; }
         public bool Enabled { get; set; } = true;
         public RuleExpressionType RuleExpressionType { get; set; }
         public IEnumerable<string> WorkflowsToInject { get; set; }
 
+        /// <summary>
+        ///     This is how the nested rules could be defined.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<IRule> GetNestedRules()
         {
             return ThisIsAmazingRule;
         }
 
+        /// <summary>
+        ///     Set the rules in the correct format.
+        ///     Sometimes it's good to use OfType to get the correct type of rule.
+        /// </summary>
+        /// <param name="rules"></param>
         public void SetRules(IEnumerable<IRule> rules)
         {
             ThisIsAmazingRule = rules.OfType<CustomRule>().ToArray();
@@ -128,13 +166,10 @@ public class CustomRuleAndWorkflowTest
         public string Expression { get; set; }
         public RuleActions Actions { get; set; }
         public string SuccessEvent { get; set; }
-
-        public string RandomProperty { get; set; }
     }
 
     public class CustomWorkflow : IWorkflow
     {
-        public IEnumerable<string> WorkflowRulesToInject { get; set; }
         public IEnumerable<CustomRule> Rules { get; set; }
         public string WorkflowName { get; set; }
         public IEnumerable<string> WorkflowsToInject { get; set; }

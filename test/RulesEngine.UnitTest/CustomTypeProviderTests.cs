@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Moq;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Dynamic.Core;
@@ -14,29 +13,14 @@ namespace RulesEngine.UnitTest;
 [ExcludeFromCodeCoverage]
 public sealed class CustomTypeProviderTests : IDisposable
 {
-    private readonly MockRepository _mockRepository;
     private bool _disposed;
 
-    public CustomTypeProviderTests()
-    {
-        _mockRepository = new MockRepository(MockBehavior.Strict);
-    }
 
     public void Dispose()
-    {
-        Dispose(true);
-    }
-
-    private void Dispose(bool disposing)
     {
         if (_disposed)
         {
             return;
-        }
-
-        if (disposing)
-        {
-            _mockRepository.VerifyAll();
         }
 
         _disposed = true;

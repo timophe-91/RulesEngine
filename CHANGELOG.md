@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4]
+
+- Enhanced existing Test to check if Custom Workflows and Rules stay unchanged in result
+- Added Demo for Custom Workflows and Rules
+- Removed Moq, since it was unused
+
 ## [1.1.0] Pre-release
 
 - Added Interface for Rule and Workflow, to better customize handling of rules and workflows.

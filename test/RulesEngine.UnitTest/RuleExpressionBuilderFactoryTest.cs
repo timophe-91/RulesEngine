@@ -6,7 +6,6 @@ using RulesEngine.Models;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
-using FluentValidation;
 
 namespace RulesEngine.UnitTest;
 
