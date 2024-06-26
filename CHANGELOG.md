@@ -15,11 +15,9 @@ All notable changes to this project will be documented in this file.
     - If something breaks, please let me know, so I can fix it.
  
 ## [1.X.2] Both Versions
-- Bump System.Linq.Dynamic.Core to 1.4.2 ([/microsoft/RulesEngine/issues/614](https://github.com/microsoft/RulesEngine/issues/614))
-
-## [1.X.2] Both Versions
 
 - Bump System.Linq.Dynamic.Core to 1.4.2 ([/microsoft/RulesEngine/issues/614](https://github.com/microsoft/RulesEngine/issues/614))
+
 
 ## [1.0.0]
 
