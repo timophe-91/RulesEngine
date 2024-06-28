@@ -26,7 +26,7 @@ public abstract class ActionBase
         {
             if (includeRuleResults)
             {
-                result.Results = new List<RuleResultTree> { context.GetParentRuleResult() };
+                result.Results = [context.GetParentRuleResult()];
             }
         }
 
