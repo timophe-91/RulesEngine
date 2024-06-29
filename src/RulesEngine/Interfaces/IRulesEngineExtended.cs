@@ -30,7 +30,8 @@ public interface IRulesEngineExtended : IRulesEngine
     /// <param name="cancellationToken">The cancellation token</param>
     /// <param name="inputs">A variable number of inputs</param>
     /// <returns>List of rule results</returns>
-    ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params object[] inputs);
+    ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken,
+        params object[] inputs);
 
     /// <summary>
     ///     This will execute all the rules of the specified workflow
@@ -39,7 +40,8 @@ public interface IRulesEngineExtended : IRulesEngine
     /// <param name="cancellationToken">The cancellation token</param>
     /// <param name="ruleParams">A variable number of rule parameters</param>
     /// <returns>List of rule results</returns>
-    ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params RuleParameter[] ruleParams);
+    ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken,
+        params RuleParameter[] ruleParams);
 
     /// <summary>
     ///     This will execute all the rules of the specified workflow
@@ -49,6 +51,7 @@ public interface IRulesEngineExtended : IRulesEngine
     /// <param name="cancellationToken">The cancellation token</param>
     /// <param name="ruleParameters">The rule parameters</param>
     /// <returns></returns>
-    ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, CancellationToken cancellationToken,
+    ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName,
+        CancellationToken cancellationToken,
         RuleParameter[] ruleParameters);
 }

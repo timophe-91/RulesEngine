@@ -19,17 +19,10 @@ public class ActionContext
         foreach (var kv in context)
         {
             var key = kv.Key;
-            string value;
-            switch (kv.Value.GetType().Name)
-            {
-                case "String":
-                case "JsonElement":
-                    value = kv.Value.ToString();
-                    break;
-                default:
-                    value = JsonConvert.SerializeObject(kv.Value);
-                    break;
-            }
+            var value = kv.Value.GetType().Name switch {
+                "String" or "JsonElement" => kv.Value.ToString(),
+                _ => JsonConvert.SerializeObject(kv.Value)
+            };
 
             _context.Add(key, value);
         }

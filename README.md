@@ -17,7 +17,8 @@ This fork will develop detached from the original project.
 
 ## Now with Interface
 
-I added Interfaces for Rule and Workflow, to easier customize the behaviour of the rule to personal needs. Tried to not do breaking changes.
+I added Interfaces for Rule and Workflow, to easier customize the behaviour of the rule to personal needs. Tried to not
+do breaking changes.
 
 ## Roadmap
 

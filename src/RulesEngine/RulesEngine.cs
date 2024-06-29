@@ -78,7 +78,7 @@ public class RulesEngine : IRulesEngineExtended
     }
 
     /// <summary>
-    ///    Initializes a new instance of the <see cref="RulesEngine" /> class.
+    ///     Initializes a new instance of the <see cref="RulesEngine" /> class.
     /// </summary>
     /// <param name="workflows">The workflows.</param>
     /// <param name="reSettings">The <see cref="ReSettings" /> to use for the rules engine</param>
@@ -153,13 +153,14 @@ public class RulesEngine : IRulesEngineExtended
     public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName,
         CancellationToken cancellationToken, params RuleParameter[] ruleParams)
     {
-        Array.Sort(ruleParams, (a, b) => string.Compare(a.Name, b.Name));
-        var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+        Array.Sort(ruleParams, (a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCulture));
+        var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams, cancellationToken);
         await ExecuteActionAsync(ruleResultList);
         return ruleResultList;
     }
 
-    private async ValueTask ExecuteActionAsync(List<RuleResultTree> ruleResultList, CancellationToken cancellationToken = default)
+    private async ValueTask ExecuteActionAsync(List<RuleResultTree> ruleResultList,
+        CancellationToken cancellationToken = default)
     {
         foreach (var ruleResult in ruleResultList)
         {
@@ -199,7 +200,7 @@ public class RulesEngine : IRulesEngineExtended
     /// <param name="resultTree">The result tree to execute action on.</param>
     /// <param name="includeRuleResults">if set to <c>true</c> [include rule results].</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>
+    /// <returns>The <see cref="ActionRuleResult" />.</returns>
     private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree,
         bool includeRuleResults = false, CancellationToken cancellationToken = default)
     {
@@ -214,6 +215,7 @@ public class RulesEngine : IRulesEngineExtended
                 ruleParameters, includeRuleResults);
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         //If there is no action,return output as null and return the result for rule
         return new ActionRuleResult {
             Output = null, Results = includeRuleResults ? new List<RuleResultTree> { resultTree } : null
@@ -312,9 +314,11 @@ public class RulesEngine : IRulesEngineExtended
     ///     This will validate workflow rules then call execute method
     /// </summary>
     /// <param name="workflowName">workflow name</param>
-    /// <param name="ruleParams"></param>
+    /// <param name="ruleParams">The rule parameters.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>list of rule result set</returns>
-    private List<RuleResultTree> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams)
+    private List<RuleResultTree> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams,
+        CancellationToken cancellationToken)
     {
         List<RuleResultTree> result;
 
