@@ -39,7 +39,7 @@ public class EvaluateRuleAction : ActionBase
         };
     }
 
-    public async override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters,
+    async override protected ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters,
         CancellationToken cancellationToken = default)
     {
         var workflowName = context.GetContext<string>("workflowName");

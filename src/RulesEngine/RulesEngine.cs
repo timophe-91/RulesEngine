@@ -212,13 +212,13 @@ public class RulesEngine : IRulesEngineExtended
             var action = _actionFactory.Get(actionInfo.Name);
             var ruleParameters = resultTree.Inputs.Select(kv => new RuleParameter(kv.Key, kv.Value)).ToArray();
             return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree),
-                ruleParameters, includeRuleResults);
+                ruleParameters, includeRuleResults, cancellationToken);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
         //If there is no action,return output as null and return the result for rule
         return new ActionRuleResult {
-            Output = null, Results = includeRuleResults ? new List<RuleResultTree> { resultTree } : null
+            Output = null, Results = includeRuleResults ? [resultTree] : null
         };
     }
 

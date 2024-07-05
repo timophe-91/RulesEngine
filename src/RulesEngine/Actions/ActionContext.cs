@@ -10,7 +10,7 @@ namespace RulesEngine.Actions;
 
 public class ActionContext
 {
-    private readonly IDictionary<string, string> _context;
+    private readonly Dictionary<string, string> _context;
     private readonly RuleResultTree _parentResult;
 
     public ActionContext(IDictionary<string, object> context, RuleResultTree parentResult)

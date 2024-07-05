@@ -33,6 +33,6 @@ public abstract class ActionBase
         return result;
     }
 
-    public abstract ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters,
+    protected abstract ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters,
         CancellationToken cancellationToken = default);
 }

@@ -17,7 +17,7 @@ public class OutputExpressionAction : ActionBase
         _ruleExpressionParser = ruleExpressionParser;
     }
 
-    public override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters,
+    override protected ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
