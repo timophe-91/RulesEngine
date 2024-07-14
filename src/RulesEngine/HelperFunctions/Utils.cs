@@ -40,15 +40,15 @@ public static class Utils
         foreach (var expando in (IDictionary<string, object>)input)
         {
             Type value;
-            if (expando.Value is IList)
+            if (expando.Value is IList list)
             {
-                if (((IList)expando.Value).Count == 0)
+                if (list.Count == 0)
                 {
                     value = typeof(List<object>);
                 }
                 else
                 {
-                    var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
+                    var internalType = CreateAbstractClassType(list[0]);
                     value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                 }
             }
@@ -66,7 +66,7 @@ public static class Utils
 
     public static object CreateObject(Type type, dynamic input)
     {
-        if (!(input is ExpandoObject))
+        if (input is not ExpandoObject expandoObject)
         {
             return Convert.ChangeType(input, type);
         }
@@ -75,39 +75,39 @@ public static class Utils
 
         var typeProps = type.GetProperties().ToDictionary(c => c.Name);
 
-        foreach (var expando in (IDictionary<string, object>)input)
+        foreach (var expando in expandoObject)
         {
-            if (typeProps.ContainsKey(expando.Key) &&
-                expando.Value != null && (expando.Value.GetType().Name != "DBNull" || expando.Value != DBNull.Value))
+            if (!typeProps.TryGetValue(expando.Key, out var value) ||
+                expando.Value == null || (expando.Value.GetType().Name == "DBNull" && expando.Value == DBNull.Value))
             {
-                object val;
-                var propInfo = typeProps[expando.Key];
-                if (expando.Value is ExpandoObject)
-                {
-                    var propType = propInfo.PropertyType;
-                    val = CreateObject(propType, expando.Value);
-                }
-                else if (expando.Value is IList)
-                {
-                    var internalType = propInfo.PropertyType.GenericTypeArguments.FirstOrDefault() ?? typeof(object);
-                    var temp = (IList)expando.Value;
-                    var newList = new List<object>().Cast(internalType).ToList(internalType);
-                    for (var i = 0; i < temp.Count; i++)
-                    {
-                        var child = CreateObject(internalType, temp[i]);
-                        newList.Add(child);
-                    }
-
-                    ;
-                    val = newList;
-                }
-                else
-                {
-                    val = expando.Value;
-                }
-
-                propInfo.SetValue(obj, val, null);
+                continue;
             }
+
+            object val;
+            var propInfo = value;
+            if (expando.Value is ExpandoObject)
+            {
+                var propType = propInfo.PropertyType;
+                val = CreateObject(propType, expando.Value);
+            }
+            else if (expando.Value is IList temp)
+            {
+                var internalType = propInfo.PropertyType.GenericTypeArguments.FirstOrDefault() ?? typeof(object);
+                var newList = new List<object>().Cast(internalType).ToList(internalType);
+                foreach (var t in temp)
+                {
+                    var child = CreateObject(internalType, t);
+                    newList.Add(child);
+                }
+
+                val = newList;
+            }
+            else
+            {
+                val = expando.Value;
+            }
+
+            propInfo.SetValue(obj, val, null);
         }
 
         return obj;
@@ -116,14 +116,14 @@ public static class Utils
     private static IEnumerable Cast(this IEnumerable self, Type innerType)
     {
         var methodInfo = typeof(Enumerable).GetMethod("Cast");
-        var genericMethod = methodInfo.MakeGenericMethod(innerType);
-        return genericMethod.Invoke(null, new[] { self }) as IEnumerable;
+        var genericMethod = methodInfo?.MakeGenericMethod(innerType);
+        return genericMethod?.Invoke(null, [self]) as IEnumerable;
     }
 
     private static IList ToList(this IEnumerable self, Type innerType)
     {
         var methodInfo = typeof(Enumerable).GetMethod("ToList");
         var genericMethod = methodInfo.MakeGenericMethod(innerType);
-        return genericMethod.Invoke(null, new[] { self }) as IList;
+        return genericMethod.Invoke(null, [self]) as IList;
     }
 }

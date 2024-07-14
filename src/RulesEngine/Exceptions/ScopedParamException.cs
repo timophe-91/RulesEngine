@@ -5,7 +5,7 @@ using System;
 
 namespace RulesEngine.Exceptions;
 
-public class ScopedParamException : Exception
+public sealed class ScopedParamException : Exception
 {
     public ScopedParamException(string message, Exception innerException, string scopedParamName) : base(message,
         innerException)
