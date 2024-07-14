@@ -324,7 +324,8 @@ public class RulesEngine : IRulesEngineExtended
 
         if (RegisterRule(workflowName, ruleParams))
         {
-            result = ExecuteAllRuleByWorkflow(workflowName, ruleParams);
+            cancellationToken.ThrowIfCancellationRequested();
+            result = ExecuteAllRuleByWorkflow(workflowName, cancellationToken, ruleParams);
         }
         else
         {
@@ -408,15 +409,18 @@ public class RulesEngine : IRulesEngineExtended
     /// <summary>
     ///     This will execute the compiled rules
     /// </summary>
-    /// <param name="workflowName"></param>
-    /// <param name="ruleParameters"></param>
+    /// <param name="workflowName">The workflow to execute rules for.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="ruleParameters">The rule parameters, for the rules to execute.</param>
     /// <returns>list of rule result set</returns>
-    private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
+    private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, CancellationToken cancellationToken,
+        RuleParameter[] ruleParameters)
     {
         var result = new List<RuleResultTree>();
         var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
         foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values ?? [])
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var resultTree = compiledRule(ruleParameters);
             result.Add(resultTree);
         }
