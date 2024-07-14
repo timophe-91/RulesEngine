@@ -68,18 +68,13 @@ public class RuleExpressionParser
         }
 
         var expressionBody = new List<Expression> { e };
-        var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, new ParameterExpression[] { });
+        var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, []);
         return CompileExpression(wrappedExpression);
     }
 
     private Func<object[], T> CompileExpression<T>(Expression<Func<object[], T>> expression)
     {
-        if (_reSettings.UseFastExpressionCompiler)
-        {
-            return expression.CompileFast();
-        }
-
-        return expression.Compile();
+        return _reSettings.UseFastExpressionCompiler ? expression.CompileFast() : expression.Compile();
     }
 
     private Expression<Func<object[], T>> WrapExpression<T>(List<Expression> expressionList,
@@ -116,8 +111,8 @@ public class RuleExpressionParser
         });
     }
 
-    // <summary>
-    /// Gets the parameter expression.
+    /// <summary>
+    ///     Gets the parameter expression.
     /// </summary>
     /// <param name="ruleParams">The types.</param>
     /// <returns></returns>
@@ -148,7 +143,6 @@ public class RuleExpressionParser
 
 
         var variableExpressions = CreateAssignedParameterExpression(ruleExpParams);
-
         body.AddRange(variableExpressions);
 
         var dict = Expression.Variable(typeof(Dictionary<string, object>));

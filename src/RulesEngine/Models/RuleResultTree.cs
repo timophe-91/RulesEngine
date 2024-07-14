@@ -44,7 +44,7 @@ public class RuleResultTree
     /// <value>
     ///     The child result.
     /// </value>
-    public IEnumerable<RuleResultTree> ChildResults { get; set; }
+    public List<RuleResultTree> ChildResults { get; set; }
 
     /// <summary>
     ///     Gets or sets the input object

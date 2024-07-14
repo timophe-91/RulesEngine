@@ -10,7 +10,7 @@ internal class ActionFactory
 {
     private readonly IDictionary<string, Func<ActionBase>> _actionRegistry;
 
-    internal ActionFactory()
+    private ActionFactory()
     {
         _actionRegistry = new Dictionary<string, Func<ActionBase>>(StringComparer.OrdinalIgnoreCase);
     }

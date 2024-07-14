@@ -7,9 +7,5 @@ using System.Collections.Generic;
 
 namespace RulesEngine.Exceptions;
 
-public class RuleValidationException : ValidationException
-{
-    public RuleValidationException(string message, IEnumerable<ValidationFailure> errors) : base(message, errors)
-    {
-    }
-}
+public class RuleValidationException(string message, IEnumerable<ValidationFailure> errors)
+    : ValidationException(message, errors);

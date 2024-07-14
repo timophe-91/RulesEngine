@@ -207,16 +207,15 @@ internal class RuleCompiler
     }
 
 
-    private (bool isSuccess, IEnumerable<RuleResultTree> result) ApplyOperation(RuleParameter[] paramArray,
-        IEnumerable<RuleFunc<RuleResultTree>> ruleFuncList, ExpressionType operation)
+    private (bool isSuccess, List<RuleResultTree> result) ApplyOperation(RuleParameter[] paramArray,
+        List<RuleFunc<RuleResultTree>> ruleFuncList, ExpressionType operation)
     {
         if (ruleFuncList is null)
         {
             return (false, new List<RuleResultTree>());
         }
 
-        var ruleFuncs = ruleFuncList as RuleFunc<RuleResultTree>[] ?? ruleFuncList.ToArray();
-        if (ruleFuncs.Length <= 0)
+        if (ruleFuncList.Count <= 0)
         {
             return (false, new List<RuleResultTree>());
         }
@@ -224,9 +223,8 @@ internal class RuleCompiler
         var resultList = new List<RuleResultTree>();
         var isSuccess = operation is ExpressionType.And or ExpressionType.AndAlso;
 
-        foreach (var ruleFunc in ruleFuncs)
+        foreach (var ruleResult in ruleFuncList.Select(ruleFunc => ruleFunc(paramArray)))
         {
-            var ruleResult = ruleFunc(paramArray);
             resultList.Add(ruleResult);
             switch (operation)
             {

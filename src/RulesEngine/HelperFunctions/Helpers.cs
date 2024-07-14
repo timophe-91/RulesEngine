@@ -25,7 +25,7 @@ internal static class Helpers
     /// <param name="exceptionMessage">The exception message if the isSuccessFunc throws an Exception</param>
     /// <returns>The <see cref="RuleFunc{RuleResultTree}" /> function.</returns>
     internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, IRule rule,
-        IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
+        List<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
     {
         return inputs => {
             bool isSuccess;
