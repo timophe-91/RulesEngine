@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -899,6 +900,30 @@ public class RulesEngineTest
         Assert.Equal(combinedMethods.Count(), classMethods.Length);
     }
 
+    [Fact]
+    public void ExecuteRule_WithCancellation_ShouldCancel()
+    {
+        var workflow = new Workflow {
+            WorkflowName = "Test",
+            Rules = new Rule[] {
+                new() {
+                    RuleName = "RuleWithLocalParam",
+                    RuleExpressionType = RuleExpressionType.LambdaExpression,
+                    Expression = "input1 == null || input1.hello.world = \"wow\""
+                }
+            }
+        };
+
+        var re = new RulesEngine();
+        re.AddWorkflow(workflow);
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        var result = re.ExecuteAllRulesAsync("Test", cancellationToken: cts.Token, new RuleParameter("input1", value: null));
+
+        Assert.Throws<OperationCanceledException>(() => result!.GetAwaiter().GetResult());
+    }
 
     private RulesEngine CreateRulesEngine(Workflow workflow)
     {
