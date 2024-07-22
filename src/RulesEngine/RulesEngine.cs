@@ -217,9 +217,7 @@ public class RulesEngine : IRulesEngineExtended
 
         cancellationToken.ThrowIfCancellationRequested();
         //If there is no action,return output as null and return the result for rule
-        return new ActionRuleResult {
-            Output = null, Results = includeRuleResults ? [resultTree] : null
-        };
+        return new ActionRuleResult { Output = null, Results = includeRuleResults ? [resultTree] : null };
     }
 
     #endregion
