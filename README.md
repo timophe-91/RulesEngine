@@ -19,7 +19,18 @@ do breaking changes.
 
 ## Roadmap
 
-The Roadmap can be found [here](https://github.com/timophe-91/RulesEngine/blob/main/ROADMAP.md)
+This is the Roadmap of this RulesEngine fork.
+
+- Add Event to OnFailed
+- Enhance and Correct the Wiki
+- Add LogicalRule and LeafRule as classes for easier use
+- Add AI Support for the RulesEngine (OpenAI and Google probably)
+
+
+Somewhat later:
+Probably breaking changes:
+- Migrate from Newtonsoft.Json to System.Text.Json
+
 
 ## Overview
 

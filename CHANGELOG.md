@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.2.0]  In Development
+## [1.2.1]
+
+-- Updated dependencies 
+
+## [1.2.0] 
 
 - Added Support for CancellationTokens in the RulesEngine
 - Using Lists and Arrays instead of IEnumerable, for minor performance improvements
