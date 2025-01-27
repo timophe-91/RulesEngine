@@ -1,10 +1,17 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [1.2.3]
+
+- Updated System.Linq.Dynamic.Core to 1.6.0, because of CVE-2024-51417: https://github.com/advisories/GHSA-4cv2-4hjh-77rx
+
+## [1.2.2]
+
+- Updated dependencies
 
 ## [1.2.1]
 
--- Updated dependencies 
+- Updated dependencies 
 
 ## [1.2.0] 
 
