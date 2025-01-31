@@ -35,7 +35,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastExpressionCompiler" Version="5.0.1" />
+        <PackageReference Include="FastExpressionCompiler" Version="5.0.2" />
         <PackageReference Include="FluentValidation" Version="11.11.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0" />
