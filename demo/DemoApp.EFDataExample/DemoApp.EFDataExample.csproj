@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj"/>
+        <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" />
     </ItemGroup>
 
 </Project>
