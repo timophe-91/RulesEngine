@@ -1,15 +1,5 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow checks out code, performs a Codacy security scan
-# and integrates the results with the
-# GitHub Advanced Security code scanning feature.  For more information on
-# the Codacy security scan action usage and parameters, see
-# https://github.com/codacy/codacy-analysis-cli-action.
-# For more information on Codacy Analysis CLI in general, see
-# https://github.com/codacy/codacy-analysis-cli.
+# This workflow checks out code, runs Codacy, then splits SARIF into
+# one-run-per-file with unique categories before uploading to GitHub.
 
 name: Codacy Security Scan
 
@@ -17,7 +7,6 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    # The branches below must be a subset of the branches above
     branches: [ "main" ]
   schedule:
     - cron: '41 2 * * 0'
@@ -28,34 +17,74 @@ permissions:
 jobs:
   codacy-security-scan:
     permissions:
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      contents: read           # checkout
+      security-events: write   # upload SARIF
+      actions: read            # required on private repos for upload-sarif
     name: Codacy Security Scan
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository to the GitHub Actions runner
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Execute Codacy Analysis CLI and generate a SARIF output with the security issues identified during the analysis
+      # Generate SARIF with Codacy (single file that may contain multiple runs)
       - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@97bf5df3c09e75f5bcd72695998f96ebd701846e
+        uses: codacy/codacy-analysis-cli-action@562ee3e92b8e92df8b67e0a5ff8aa8e261919c08
         with:
-          # Check https://github.com/codacy/codacy-analysis-cli#project-token to get your project token from your Codacy repository
-          # You can also omit the token and run the tools that support default configurations
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           verbose: true
           output: results.sarif
           format: sarif
-          # Adjust severity of non-security issues
           gh-code-scanning-compat: true
-          # Force 0 exit code to allow SARIF file generation
-          # This will handover control about PR rejection to the GitHub side
+          # Force 0 exit code so we always produce SARIF (let GitHub own PR status)
           max-allowed-issues: 2147483647
 
-      # Upload the SARIF file generated in the previous step
-      - name: Upload SARIF results file
+      # Workaround for GitHub change:
+      # Split the SARIF runs into separate files and ensure each has a unique category
+      - name: Split SARIF into one run per file (set unique categories)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, re, sys
+          src = "results.sarif"
+          try:
+              with open(src, "r", encoding="utf-8") as f:
+                  data = json.load(f)
+          except FileNotFoundError:
+              print("No results.sarif produced; nothing to upload.")
+              sys.exit(0)
+
+          runs = data.get("runs", [])
+          if not runs:
+              print("SARIF has no runs; nothing to upload.")
+              sys.exit(0)
+
+          version = data.get("version", "2.1.0")
+          schema  = data.get("$schema")
+
+          os.makedirs("sarif-split", exist_ok=True)
+
+          def slug(s: str) -> str:
+              return re.sub(r"[^A-Za-z0-9_.-]+", "-", s)[:64] or "run"
+
+          for i, run in enumerate(runs):
+              tool = (((run or {}).get("tool", {}) or {}).get("driver", {}) or {}).get("name", "tool")
+              base = (((run or {}).get("automationDetails", {}) or {}).get("id")) or tool
+              new_id = f"codacy-{slug(base)}-{i}"  # unique category per run
+              run.setdefault("automationDetails", {})["id"] = new_id
+
+              out = { "version": version, "runs": [run] }
+              if schema: out["$schema"] = schema
+
+              fname = f"sarif-split/{i}-{slug(tool)}.sarif"
+              with open(fname, "w", encoding="utf-8") as o:
+                  json.dump(out, o)
+              print(f"Wrote {fname} with category {new_id}")
+          PY
+
+      # Upload the directory of split SARIF files.
+      # When uploading a directory, each SARIF must have a unique runAutomationDetails.id.
+      - name: Upload SARIF results
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: results.sarif
+          sarif_file: sarif-split
